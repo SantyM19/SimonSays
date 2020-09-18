@@ -100,6 +100,7 @@
       const verde = document.getElementById('verde')
       const btnEmpezar = document.getElementById('btnEmpezar')
       const VELOCIDAD = 0.5
+      const ULTIMO_NIVEL = 10
 
       class Juego {
         constructor() {
@@ -111,6 +112,7 @@
         inicializar() {
           btnEmpezar.classList.add('hide')
           this.elegirColor = this.elegirColor.bind(this)
+          this.siguienteNivel = this.siguienteNivel.bind(this)
           this.nivel = 1
           this.colores = {
             celeste,
@@ -125,6 +127,7 @@
         }
 
         siguienteNivel() {
+          this.subnivel = 0
           this.iluminarSecuencia()
           this.agregarEventosClick()
         }
@@ -134,6 +137,13 @@
           if (num === 1) return 'violeta'
           if (num === 2) return 'naranja'
           if (num === 3) return 'verde'
+        }
+
+        transformarColorANumero(color) {
+          if (color === 'celeste') return 0
+          if (color === 'violeta') return 1
+          if (color === 'naranja') return 2
+          if (color === 'verde') return 3
         }
 
         iluminarSecuencia() {
@@ -159,8 +169,32 @@
           this.colores.naranja.addEventListener('click', this.elegirColor)
         }
 
+        eliminarEventosClick() {
+          this.colores.celeste.removeEventListener('click', this.elegirColor)
+          this.colores.verde.removeEventListener('click', this.elegirColor)
+          this.colores.violeta.removeEventListener('click', this.elegirColor)
+          this.colores.naranja.removeEventListener('click', this.elegirColor)
+        }
+
         elegirColor(ev) {
-          console.log(ev)
+          const nombreColor = ev.target.dataset.color
+          const numeroColor = this.transformarColorANumero(nombreColor)
+          this.iluminarColor(nombreColor)
+          if (numeroColor === this.secuencia[this.subnivel]) {
+            // Adivinó el color
+            this.subnivel++
+            if (this.subnivel === this.nivel) {
+              this.nivel++
+              this.eliminarEventosClick()
+              if (this.nivel === (ULTIMO_NIVEL + 1)) {
+                // Ganó!
+              } else {
+                setTimeout(this.siguienteNivel, 2000)
+              }
+            }
+          } else {
+            // perdió
+          }
         }
       }
 
